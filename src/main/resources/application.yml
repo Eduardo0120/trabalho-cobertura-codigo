@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: qa-backend-java21
+
+server:
+  port: 8081
