@@ -26,12 +26,27 @@ Voce recebeu uma API backend em Java 21 que simula regras de clientes, saldo, pr
 - Relatorios administrativos.
 - Tratamento de erros HTTP.
 
+## Cenarios sugeridos
+
+Use [docs/CENARIOS_TESTE_CANDIDATO.md](docs/CENARIOS_TESTE_CANDIDATO.md) como guia para montar sua suite. O guia contem exemplos de cenarios de acerto, erro de negocio, erro tecnico, seguranca e validacao HTTP.
+
+O candidato nao precisa se limitar ao guia. Casos adicionais bem justificados contam positivamente, especialmente quando cobrem limites, efeitos colaterais e regras de negocio nao obvias.
+
 ## Entregaveis
 
 - Link do fork.
 - Pull request ou branch com os testes criados.
 - Relatorio de cobertura.
 - Documento com bugs encontrados.
+
+## Criterios de avaliacao
+
+- Cobertura de codigo em services, controllers e handlers de erro.
+- Qualidade dos cenarios escolhidos, incluindo caminhos felizes e negativos.
+- Clareza dos asserts e independencia entre testes.
+- Capacidade de identificar comportamento incorreto mesmo quando o codigo executa sem excecao.
+- Evidencias objetivas para cada bug reportado.
+- Organizacao do relatorio e severidade coerente com o impacto.
 
 ## Formato esperado para bugs
 

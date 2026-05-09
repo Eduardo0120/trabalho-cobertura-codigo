@@ -104,3 +104,5 @@ Criar pedido:
 ## Atividade do candidato
 
 Leia [DESAFIO_CANDIDATO.md](DESAFIO_CANDIDATO.md) antes de iniciar. Use [docs/MODELO_RELATORIO_BUGS.md](docs/MODELO_RELATORIO_BUGS.md) como sugestao de formato para documentar as evidencias.
+
+Para planejar a cobertura, consulte tambem [docs/CENARIOS_TESTE_CANDIDATO.md](docs/CENARIOS_TESTE_CANDIDATO.md). O arquivo traz uma matriz de cenarios de sucesso, erro de negocio, erro tecnico e seguranca.
