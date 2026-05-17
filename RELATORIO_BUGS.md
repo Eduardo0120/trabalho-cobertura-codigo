@@ -358,29 +358,243 @@ Expected BusinessException to be thrown, but nothing was thrown.
 ### Impacto
 Gera inconsistência financeira e pedidos inválidos.
 ---
+# Tratamento de Erros HTTP
 
-# Considerações Finais
+---
 
-Os testes implementados cobriram cenários críticos relacionados a:
-- validação de clientes
-- operações financeiras
-- criação de pedidos
-- cálculo de totais
-- estoque
-- aplicação de cupons
-- tratamento de exceções
+## Cenário validado - NotFoundException retorna HTTP 404
 
-Foram identificados defeitos relevantes de negócio e consistência de dados, principalmente relacionados a:
-- validações insuficientes
-- inconsistência financeira
-- regras frágeis de negócio
-- integridade de estoque
-- aprovação indevida de pedidos
+### Tipo
+Usabilidade de API / Tratamento de erro
 
-Os bugs encontrados foram documentados utilizando:
-- testes unitários automatizados
-- evidências reproduzíveis
-- mensagens de erro
-- comparação entre comportamento esperado e comportamento atual
+### Severidade
+Média
 
-Os testes priorizaram qualidade de cenários críticos ao invés de quantidade excessiva de casos superficiais.
+### Classe/Endpoint afetado
+GET /api/customers/{id}
+
+### Pré-condições
+Cliente inexistente.
+
+### Passos para reproduzir
+1. Realizar requisição GET para `/api/customers/99`
+2. Simular `NotFoundException` no CustomerService
+3. Executar requisição HTTP
+
+### Resultado atual
+A API retorna HTTP 404 com mensagem de erro.
+
+### Resultado esperado
+A API deve retornar HTTP 404 quando o cliente não existir.
+
+### Evidências
+Teste unitário:
+```java
+deveRetornar404QuandoClienteNaoExistir()
+```
+
+Resposta esperada:
+```json
+{
+  "message": "Cliente nao encontrado."
+}
+```
+
+### Impacto
+Garante padronização correta de erros HTTP para recursos inexistentes.
+
+---
+
+## Cenário validado - BusinessException retorna HTTP 400
+
+### Tipo
+Usabilidade de API / Tratamento de erro
+
+### Severidade
+Média
+
+### Classe/Endpoint afetado
+POST /api/customers/{id}/withdraw
+
+### Pré-condições
+Operação inválida de negócio.
+
+### Passos para reproduzir
+1. Realizar requisição POST para `/api/customers/1/withdraw`
+2. Simular `BusinessException`
+3. Executar operação
+
+### Resultado atual
+A API retorna HTTP 400 com mensagem de erro.
+
+### Resultado esperado
+A API deve retornar HTTP 400 para erros de negócio.
+
+### Evidências
+Teste unitário:
+```java
+deveRetornar400QuandoOcorrerErroDeNegocio()
+```
+
+Resposta esperada:
+```json
+{
+  "message": "Saldo insuficiente."
+}
+```
+
+### Impacto
+Garante tratamento adequado para regras de negócio inválidas.
+
+---
+
+## Cenário validado - Payload inválido retorna HTTP 400
+
+### Tipo
+Usabilidade de API / Validação HTTP
+
+### Severidade
+Baixa
+
+### Classe/Endpoint afetado
+POST /api/customers
+
+### Pré-condições
+Payload JSON inválido.
+
+### Passos para reproduzir
+1. Realizar requisição POST para `/api/customers`
+2. Enviar JSON malformado
+3. Executar requisição
+
+### Resultado atual
+A API retorna HTTP 400.
+
+### Resultado esperado
+A API deve rejeitar payload inválido com HTTP 400.
+
+### Evidências
+Teste unitário:
+```java
+deveRetornar400QuandoPayloadForInvalido()
+```
+
+Payload utilizado:
+```json
+{
+  "name": "Eduardo",
+  "email":
+}
+```
+
+### Impacto
+Evita processamento de requisições inválidas e melhora robustez da API.
+
+# Relatórios Administrativos
+
+---
+
+## Cenário validado - Geração de resumo administrativo
+
+### Tipo
+Relatório Administrativo / Regra de negócio
+
+### Severidade
+Baixa
+
+### Classe/Método afetado
+ReportService.summary()
+
+### Pré-condições
+Existem clientes e pedidos cadastrados no sistema.
+
+### Passos para reproduzir
+1. Mockar dois clientes cadastrados
+2. Mockar dois pedidos aprovados
+3. Executar `ReportService.summary()`
+4. Validar dados retornados
+
+### Resultado atual
+O relatório retorna:
+- quantidade de clientes
+- quantidade de pedidos
+- receita total
+- anotação administrativa interna
+
+### Resultado esperado
+O relatório deve consolidar corretamente os dados administrativos do sistema.
+
+### Evidências
+Teste unitário:
+```java
+deveGerarResumoAdministrativoComClientesPedidosEReceita()
+```
+
+Valores esperados:
+```text
+customers = 2
+orders = 2
+revenue = 150
+```
+
+### Observações
+O relatório expõe o campo:
+```text
+internalNote
+```
+
+Isso pode representar exposição indevida de informação administrativa interna dependendo do contexto de autenticação da API.
+
+### Impacto
+Valida funcionamento básico do endpoint administrativo e consolidação correta de métricas do sistema.
+---
+---
+
+# Cobertura de Código
+
+A cobertura de código foi gerada utilizando JaCoCo.
+
+## Comando utilizado
+
+```bash
+mvn verify -Dmaven.test.failure.ignore=true
+```
+
+## Relatório gerado
+
+```text
+target/site/jacoco/index.html
+```
+
+## Percentuais obtidos
+
+| Métrica | Cobertura |
+|---|---:|
+| Instructions | 29% |
+| Branches | 0% |
+| Lines | 69% |
+| Methods | 83% |
+| Classes | 65% |
+
+## Observações sobre a execução
+
+A suíte de testes foi executada com sucesso em termos de compilação e execução, porém alguns testes falharam propositalmente por identificarem defeitos reais de negócio documentados neste relatório.
+
+Resultado da execução:
+
+```text
+Tests run: 23
+Failures: 7
+Errors: 0
+Skipped: 0
+```
+
+As falhas correspondem aos seguintes defeitos documentados:
+
+- Depósito negativo permitido
+- Saque maior que saldo permitido
+- Cliente inativo consegue realizar pedido
+- Total do pedido ignora quantidade
+- Estoque não é reduzido após compra
+- Cupom expirado é aceito
+- Pedido pode ser aprovado com total negativo
